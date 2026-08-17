@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install dependencies",
+      "type": "shell",
+      "command": "python3 -m venv .venv && .venv/bin/python -m pip install --upgrade pip && .venv/bin/python -m pip install -r requirements.txt && .venv/bin/python -m pip install -e .",
+      "problemMatcher": []
+    },
+    {
+      "label": "Prepare demo data",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python scripts/make_demo_data.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "Train model fast",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python -m apm.models.train --data data/processed/demo_sensor_data.csv --target models",
+      "problemMatcher": []
+    },
+    {
+      "label": "Prepare FD001 data",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python scripts/prepare_cmapss.py --input data/raw/train_FD001.txt --output data/processed/cmapss_FD001.csv",
+      "problemMatcher": []
+    },
+    {
+      "label": "Train FD001 model fast",
+      "type": "shell",
+      "command": "PYTHONPATH=src SENSOR_DATA_PATH=data/processed/cmapss_FD001.csv .venv/bin/python -m apm.models.train --data data/processed/cmapss_FD001.csv --target models",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build RAG index",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python -m apm.rag.indexer --docs knowledge_base --index rag_index",
+      "problemMatcher": []
+    },
+    {
+      "label": "Seed database",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python -m apm.database.db --seed-demo",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run tests",
+      "type": "shell",
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest -q",
+      "problemMatcher": []
+    }
+  ]
+}

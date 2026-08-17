@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./rag_index:/app/rag_index
+      - ./maintenance.db:/app/maintenance.db
+

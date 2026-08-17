@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI API",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["apm.api.main:app", "--reload", "--host", "127.0.0.1", "--port", "8000"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Streamlit Dashboard",
+      "type": "python",
+      "request": "launch",
+      "module": "streamlit",
+      "args": ["run", "app/streamlit_app.py", "--server.address", "127.0.0.1", "--server.port", "8501"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Train Model Fast",
+      "type": "python",
+      "request": "launch",
+      "module": "apm.models.train",
+      "args": ["--data", "data/processed/demo_sensor_data.csv", "--target", "models"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
+
