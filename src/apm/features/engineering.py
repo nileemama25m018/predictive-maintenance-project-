@@ -22,6 +22,7 @@ def _rolling_slope(values: np.ndarray) -> float:
 def add_temporal_features(
     df: pd.DataFrame,
     windows: tuple[int, ...] = (5, 10, 20),
+    include_slopes: bool = True,
 ) -> pd.DataFrame:
     """Create high-signal time-series features per engine without future leakage."""
     df = df.sort_values(["engine_id", "cycle"]).copy()
@@ -37,13 +38,14 @@ def add_temporal_features(
             new_features[f"{col}_std_{window}"] = roll.std().reset_index(level=0, drop=True).fillna(0.0)
             new_features[f"{col}_min_{window}"] = roll.min().reset_index(level=0, drop=True)
             new_features[f"{col}_max_{window}"] = roll.max().reset_index(level=0, drop=True)
-            new_features[f"{col}_slope_{window}"] = (
-                grouped[col]
-                .rolling(window=window, min_periods=2)
-                .apply(_rolling_slope, raw=True)
-                .reset_index(level=0, drop=True)
-                .fillna(0.0)
-            )
+            if include_slopes:
+                new_features[f"{col}_slope_{window}"] = (
+                    grouped[col]
+                    .rolling(window=window, min_periods=2)
+                    .apply(_rolling_slope, raw=True)
+                    .reset_index(level=0, drop=True)
+                    .fillna(0.0)
+                )
     if new_features:
         df = pd.concat([df, pd.DataFrame(new_features, index=df.index)], axis=1)
     return df.replace([np.inf, -np.inf], np.nan).fillna(0.0).copy()

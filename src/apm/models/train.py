@@ -90,6 +90,8 @@ def main() -> None:
     parser.add_argument("--cmapss", default=None)
     parser.add_argument("--target", default="models")
     parser.add_argument("--use-lstm", action="store_true")
+    parser.add_argument("--windows", default="5,10,20", help="Comma-separated rolling windows, e.g. 5,10")
+    parser.add_argument("--no-slopes", action="store_true", help="Skip rolling slope features for faster training")
     parser.add_argument("--random-state", type=int, default=42)
     args = parser.parse_args()
 
@@ -97,7 +99,8 @@ def main() -> None:
     target_dir.mkdir(parents=True, exist_ok=True)
 
     raw = load_training_frame(args)
-    engineered = add_temporal_features(raw)
+    windows = tuple(int(w.strip()) for w in args.windows.split(",") if w.strip())
+    engineered = add_temporal_features(raw, windows=windows, include_slopes=not args.no_slopes)
     train_df, valid_df, test_df = group_train_valid_test_split(engineered, random_state=args.random_state)
     feature_cols, metadata = select_features(train_df)
 
@@ -166,6 +169,8 @@ def main() -> None:
 
     metadata["best_model"] = best_name
     metadata["engineered_feature_count"] = len(feature_cols)
+    metadata["rolling_windows"] = windows
+    metadata["include_slopes"] = not args.no_slopes
     joblib.dump(best_model, target_dir / "best_rul_model.joblib")
     save_feature_metadata(metadata, target_dir / "feature_metadata.json")
     (target_dir / "metrics.json").write_text(json.dumps(results, indent=2), encoding="utf-8")

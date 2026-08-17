@@ -28,7 +28,7 @@
     {
       "label": "Train FD001 model fast",
       "type": "shell",
-      "command": "PYTHONPATH=src SENSOR_DATA_PATH=data/processed/cmapss_FD001.csv .venv/bin/python -m apm.models.train --data data/processed/cmapss_FD001.csv --target models",
+      "command": "PYTHONPATH=src SENSOR_DATA_PATH=data/processed/cmapss_FD001.csv .venv/bin/python -m apm.models.train --data data/processed/cmapss_FD001.csv --target models --windows 5,10 --no-slopes",
       "problemMatcher": []
     },
     {
